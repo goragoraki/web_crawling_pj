@@ -1,5 +1,6 @@
+from django.core import paginator
 from django.shortcuts import render, redirect
-from .forms import HomeForm
+from .forms import HomeForm, InputForm
 from .models import News
 import requests
 import json
@@ -21,6 +22,7 @@ import  pandas as pd
 import csv
 import os
 from django import forms
+from django.core.paginator import Paginator
 # Create your views here.
 def cos_sim(a,b):
     if norm(a)*norm(b)!=0:
@@ -43,7 +45,7 @@ def Homepage(request):
     return render(request, 'home.html')
 
 def News_Crawl(request):
-    news_num = int(30)
+    news_num = int(50)
     ## create url and parsing (naver kbs news)
     news_url = 'https://search.naver.com/search.naver?where=news&query=kbs&sm=tab_clk.jou&sort=0&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0&office_type=&office_section_code=&news_office_checked=&nso=so%3Ar%2Cp%3Aall%2Ca%3Aall&is_sug_officeid=1'
     req = requests.get(news_url)
@@ -87,11 +89,12 @@ def News_Crawl(request):
         idx += 1
     print('crawling complete')
 
+    workpath =os.path.dirname(os.path.abspath(__file__))
     #save news
-    f = open('csv/news_list.csv', 'w', newline='')
+    f = open(os.path.join(workpath,'news_list.csv'), 'w', newline='',encoding='UTF-8')
     wr = csv.writer(f)
     for n in range(0,len(news_titles)):
-        wr.writerow([news_titles[n],news_main_text[n]])
+        wr.writerow([news_titles[n], news_main_text[n]])
     f.close()
 
     print('saved news')
@@ -102,7 +105,7 @@ def News_Crawl(request):
 def News_List(request):
     workpath =os.path.dirname(os.path.abspath(__file__))
 
-    f = open(os.path.join(workpath, 'news_list.csv'),'r')
+    f = open(os.path.join(workpath, 'news_list.csv'),'r',encoding='UTF-8')
     rdr =csv.reader(f)
     data_rdr = list(rdr)
     news_titles={}
@@ -162,24 +165,175 @@ def News_List(request):
     s_title = []
     s_text = []
     idx_num = 1
-    user_command = -1
     temp_idx= []
     for n in range(1, que.qsize()+1): 
         idx_num = que.get()[1]
         temp_idx.append(idx_num)
         s_title.append(news_titles[idx_num])
         s_text.append(news_main_text[idx_num])
-        print('%d. %s'%(n, news_titles[idx_num]))
 
-    f = open(os.path.join(workpath, 'news_list2.csv'), 'w', newline='')
+    f = open(os.path.join(workpath, 'news_list2.csv'), 'w', newline='',encoding='UTF-8')
     wr = csv.writer(f)
     for n in temp_idx:
         wr.writerow([news_titles[n],news_main_text[n]])
     f.close()
+
+    return redirect('homepage:list2')
+
+def News_Page(request):
+    workpath =os.path.dirname(os.path.abspath(__file__))
+
+    f = open(os.path.join(workpath, 'news_list2.csv'),'r',encoding='UTF-8')
+    rdr =csv.reader(f)
+    data_rdr = list(rdr)
+    news_titles=[]
+    for n in range(0,len(data_rdr)):
+        news_titles.append(data_rdr[n][0])
+    f.close()
+
+    page = request.GET.get('page','1')
+
+    paginator = Paginator(news_titles,20)
+    page_obj = paginator.get_page(page)
+
     context = {
-        "news_title" : s_title,
-        "news_main_text" : s_text,
-        "k_w" : k_,
+        "news_title" : news_titles,
+        "board_list" : page_obj,
     }
     return render(request, "news_list.html", context)
+
+def News_Simliar(request):
     
+    workpath =os.path.dirname(os.path.abspath(__file__))
+
+    f = open(os.path.join(workpath, 'news_list2.csv'),'r',encoding='UTF-8')
+    rdr =csv.reader(f)
+    data_rdr = list(rdr)
+    news_titles={}
+    news_main_text={}
+    for n in range(0,len(data_rdr)):
+        news_titles[n] = data_rdr[n][0]
+        news_main_text[n] = data_rdr[n][1]
+    f.close()
+
+    news_simliar = []
+    tempSimliar = []
+    temp_arr =[]
+    t_arr=[]
+    voc = []
+
+    okt = Okt()
+    for n in news_main_text.values():
+        tempSimliar.extend(okt.nouns(n))
+        t_arr.append(okt.nouns(n))
+        voc.extend(okt.morphs(n))
+
+    ## 중복 제거, 불용어 제거
+    feats = list(set(tempSimliar))
+    voc = list(set(voc))
+    stop_words = ['이제', '인물', '동안', '단번', '사이', '스무', '순간','과연','마저','만큼','누구','주변','소유자','오늘']
+    feats = list(filter(lambda x:len(x)>1 and x not in stop_words, feats))
+
+    ## 명사 매트릭스 생성
+    for n in t_arr:
+        temp_arr.append(np.array(make_matrix(feats,n)))
+
+    ## nan -> 0으로 치환
+    dataSet = pd.DataFrame(temp_arr)
+    dataSet = dataSet.fillna(0)
+    temp_arr = dataSet.values.tolist()
+    
+    if request.method == "POST":
+        k_w = InputForm(request.POST)
+        if k_w.is_valid():
+            user_command = k_w.cleaned_data['key_word']
+            print(user_command)
+
+    news_index = int(user_command)-1
+
+    t_idx =0
+    for n in temp_arr:
+        c1 = round(cos_sim(temp_arr[news_index],n),4)
+        news_simliar.append([c1, t_idx])
+        t_idx+=1
+
+    news_simliar.sort(key=lambda x:x[0])
+    news_simliar.reverse()
+
+    print("Simliar news")
+    f = open(os.path.join(workpath, 'news_similar.csv'), 'w', newline='',encoding='UTF-8')
+    wr = csv.writer(f)
+    for n in range(1,21):
+        print(n,news_titles[news_simliar[n][1]], end='')
+        print(" Similarity : %0.2f%%" %(news_simliar[n][0]*100))
+        wr.writerow([news_titles[news_simliar[n][1]],news_simliar[n][0]*100])
+    f.close()
+
+
+    ## top 5 word
+    que = PriorityQueue()
+    m_word_idx=[]
+    cnt=0
+    t_w = []
+    for n in temp_arr[news_index]:
+        que.put((-n,cnt))
+        cnt+=1  
+    print("top words")
+    for n in range(1,6):
+        t_w.append(feats[que.get()[1]])
+
+    ##세부사항 저장
+    f = open(os.path.join(workpath, 'news_detail.csv'), 'w', newline='',encoding='UTF-8')
+    wr = csv.writer(f)
+    wr.writerow([news_titles[news_index],news_main_text[news_index]])
+    f.close()
+
+    ## top5 word 저장
+    f = open(os.path.join(workpath, 'top_word.csv'), 'w', newline='',encoding='UTF-8')
+    wr = csv.writer(f)
+    for n in range(0,5):
+        wr.writerow(t_w[n])
+    f.close()
+
+    return redirect('homepage:detail')
+
+def News_Detail(request):
+
+    workpath =os.path.dirname(os.path.abspath(__file__))
+
+    ## 뉴스 내용
+    f = open(os.path.join(workpath, 'news_detail.csv'),'r',encoding='UTF-8')
+    rdr =csv.reader(f)
+    data_rdr = list(rdr)
+    n_titles=data_rdr[0][0]
+    n_main=data_rdr[0][1] 
+    f.close()
+
+    ##유사 뉴스
+    f = open(os.path.join(workpath, 'news_similar.csv'),'r',encoding='UTF-8')
+    rdr =csv.reader(f)
+    data_rdr = list(rdr)
+    s_titles=[]
+    s_sim=[]
+    for n in range(0,len(data_rdr)):
+        s_titles.append(data_rdr[n][0])
+        s_sim.append(data_rdr[n][1]) 
+    f.close()
+
+    f = open(os.path.join(workpath, 'top_word.csv'),'r',encoding='UTF-8')
+    rdr =csv.reader(f)
+    data_rdr = list(rdr)
+    top_w = []
+    for n in data_rdr:
+        top_w.append(n)
+    f.close()
+
+    s_list = zip(s_titles,s_sim)
+    context ={
+        'n_t' : n_titles,
+        'n_m' : n_main,
+        's_l' : s_list,
+        't_w' : top_w,
+    }
+
+    return render(request, "news_detail.html", context)

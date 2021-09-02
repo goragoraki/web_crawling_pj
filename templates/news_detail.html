@@ -1,0 +1,20 @@
+<h1>{{ n_t }}</h1> <br>
+{{n_m}}<br><br>
+
+top 5 word<br> 
+{% for a in t_w%}
+{{forloop.counter}}. 
+    {% for i in a%}
+        {{i}}
+    {% endfor%} <br>
+{% endfor%}
+
+<br><br>
+
+simliar news : simliarity<br>
+{% for i,n in s_l %}
+{{forloop.counter}}.{{i}} : {{n}}%<br>
+
+{% endfor %}
+       
+    

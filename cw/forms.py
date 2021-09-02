@@ -4,9 +4,7 @@ from .models import Word
 class HomeForm(forms.Form):
     key_word = forms.CharField(max_length=20)
 
-class HomeModelForm(forms.ModelForm):
-    class Meta:
-        model = Word
-        fields= (
-            'key_word',
-        )
+class InputForm(forms.Form):
+    key_word = forms.CharField(max_length=20)
+
+

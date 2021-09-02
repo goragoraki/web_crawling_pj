@@ -1,6 +1,45 @@
-<h1> About {{k_w}} news</h1>
-{% for n in news_title %}
+<h1>검색한 단어와 관련된 뉴스</h1><br>
+{% if board_list %}
+{% for n in board_list %}
 {{forloop.counter}}.{{n}}<br>
 {% endfor %}
+{%endif%}
 
+<form action = "{% url 'homepage:simliar' %}" method = "POST">
+    {% csrf_token %}
+    {{k_w.as_p}}
+    <label for = "kf"><label>
+    <input type= "text" name='key_word'> <br><br>
+    <button type = "submit">watch news</button>
+</form>
 
+<div style="text-align:center">
+    <div class="pagination">
+            
+        <div style="width:35%; margin: 5px;">
+            {% if board_list.has_previous %}
+                <a class="abutton" href="?page=1">맨 앞으로</a>
+                <a class="abutton" href="?page={{ board_list.previous_page_number }}">이전</a>
+            {% endif %}
+        </div>
+
+        <div style="width:30%; margin: 5px;">
+            {% for page in board_list.paginator.page_range %}
+                {% if page >= board_list.number|add:-2 and page <= board_list.number|add:2 %}
+                <span class="{% if page == board_list.number %}current{% endif %}">
+                    <a href="?page={{ page }}">{{ page}}</a>
+                </span>
+                {% elif page >= board_list.number|add:-3 and page <= board_list.number|add:3 %}
+                        ..
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div style="width:35%; margin: 5px;">
+            {% if board_list.has_next %}
+                <a class="abutton" href="?page={{ board_list.next_page_number }}">다음</a>
+                <a class="abutton" href="?page={{ board_list.paginator.num_pages }}">맨 뒤로</a>
+            {% endif %}
+        </div>
+    </div>  
+</div> 
