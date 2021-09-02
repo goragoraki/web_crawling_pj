@@ -44,8 +44,9 @@ def make_matrix(feats, list_data):
 def Homepage(request):
     return render(request, 'home.html')
 
+##뉴스를 가져오는 함수
 def News_Crawl(request):
-    news_num = int(50)
+    news_num = int(1000)
     ## create url and parsing (naver kbs news)
     news_url = 'https://search.naver.com/search.naver?where=news&query=kbs&sm=tab_clk.jou&sort=0&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0&office_type=&office_section_code=&news_office_checked=&nso=so%3Ar%2Cp%3Aall%2Ca%3Aall&is_sug_officeid=1'
     req = requests.get(news_url)
@@ -195,10 +196,11 @@ def News_Page(request):
 
     paginator = Paginator(news_titles,20)
     page_obj = paginator.get_page(page)
-
+    now_page = (page_obj.number-1)*20
     context = {
         "news_title" : news_titles,
         "board_list" : page_obj,
+        "n_p" : now_page,
     }
     return render(request, "news_list.html", context)
 

@@ -1,4 +1,4 @@
-<h1> 뉴스 크롤링 </h1>
+<h1> KBS 뉴스 크롤링 </h1>
 <form action = "{% url 'homepage:list' %}" method = "POST">
     {% csrf_token %}
     {{k_w.as_p}}
@@ -7,4 +7,6 @@
     <button type = "submit">start crawling</button>
 </form>
 <br><br>
+<!-- 뉴스를 가져오고 데이터를 저장할때 씀
 <a href = "{% url 'homepage:crawling' %}" type ="submit"> 뉴스 스크롤하기 </a>
+-->

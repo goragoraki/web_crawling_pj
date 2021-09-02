@@ -1,7 +1,7 @@
 <h1>검색한 단어와 관련된 뉴스</h1><br>
 {% if board_list %}
 {% for n in board_list %}
-{{forloop.counter}}.{{n}}<br>
+{{forloop.counter|add:n_p}}.{{n}}<br>
 {% endfor %}
 {%endif%}
 

@@ -13,7 +13,7 @@ top 5 word<br>
 
 simliar news : simliarity<br>
 {% for i,n in s_l %}
-{{forloop.counter}}.{{i}} : {{n}}%<br>
+{{forloop.counter}}.{{i}} : {{n|floatformat:"-3"}}%<br>
 
 {% endfor %}
        
