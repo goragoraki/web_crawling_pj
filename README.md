@@ -59,17 +59,10 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-<div align="center">
-  <a href="http://khuhub.khu.ac.kr/2017103951/today_fortune">
-    <img src="images/logo2.jpg" alt="Logo2" width="500" height="300">
-  </a>
-</div>
-
-
 
 If you enter a search term you want, it will extract news in the order of the most search terms among kbs news. If you select a news among them, the content of the news is displayed, and the 5 most frequent words in the news are displayed, and other similar news are displayed below it. The degree of similarity is also indicated here. :smile:
   
-  
+
 When searching for a word, the news was found by comparing it with the desired word through morphological analysis using the konlpy library.
   
 
@@ -127,19 +120,19 @@ Excute local
 
 Homepage (search word)
 <a href="https://github.com/goragoraki/web_crawling_pj">
-    <img src="images/example1.jpg" alt="homepage" width="800" height="400">
+    <img src="images/example1.png" alt="homepage" width="800" height="400">
 </a>
 <br/>
 <br/>
 Result of search
 <a href="https://github.com/goragoraki/web_crawling_pj">
-    <img src="images/example2.jpg" alt="serach" width="800" height="400">
+    <img src="images/example2.png" alt="serach" width="800" height="400">
 </a>
 <br/>
 <br/>
 Select news
 <a href="https://github.com/goragoraki/web_crawling_pj">
-    <img src="images/example3.jpg" alt="select" width="800" height="400">
+    <img src="images/example3.png" alt="select" width="800" height="400">
 </a>
 you can see top5 words and similarity news and similarity
 
