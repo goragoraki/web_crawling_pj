@@ -138,7 +138,7 @@ Select news
     <img src="images/example3.png" alt="select" width="900" height="800">
 </a>
 <br/>
-you can see top5 words and similarity news and similarity
+you can see top5 words and similar news and similarity
 
 
 
