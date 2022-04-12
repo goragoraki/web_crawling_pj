@@ -119,21 +119,25 @@ Excute local
   
 
 Homepage (search word)
+<br/>
 <a href="https://github.com/goragoraki/web_crawling_pj">
-    <img src="images/example1.png" alt="homepage" width="400" height="400">
+    <img src="images/example1.png" alt="homepage" width="200" height="300">
 </a>
 <br/>
 <br/>
 Result of search
+<br/>
 <a href="https://github.com/goragoraki/web_crawling_pj">
-    <img src="images/example2.png" alt="serach" width="400" height="400">
+    <img src="images/example2.png" alt="serach" width="200" height="300">
 </a>
 <br/>
 <br/>
 Select news
+<br/>
 <a href="https://github.com/goragoraki/web_crawling_pj">
-    <img src="images/example3.png" alt="select" width="400" height="400">
+    <img src="images/example3.png" alt="select" width="200" height="300">
 </a>
+<br/>
 you can see top5 words and similarity news and similarity
 
 
