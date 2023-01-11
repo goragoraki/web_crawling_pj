@@ -148,31 +148,6 @@ you can see top5 words and similar news and similarity
 
 
 
-<!-- CONTRIBUTING -->
-## Contributing
-
-If you have suggestions to improve this project, please fork the repository and create a pull request. Thank you!
-
-1. Fork the Project
-2. Create your Feature Branch 
-3. Commit your Changes 
-4. Push to the Branch 
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- LICENSE -->
-## License
-
-None
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-
 
 
 
